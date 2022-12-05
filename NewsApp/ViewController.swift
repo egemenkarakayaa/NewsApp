@@ -13,10 +13,19 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         title = "News"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         
+        APICaller.shared.getTopStories { result in
+            
+            switch result {
+            case .success(let response):
+                break
+            case .failure(let error):
+                print(error)
+                
+            }
+        }
         
     }
-
     
 }

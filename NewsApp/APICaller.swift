@@ -13,12 +13,12 @@ final class APICaller {
         
     }
     
+    
     static let shared = APICaller()
     
     struct Constants {
         
     static let topHeadlinesURL = URL(string: "https://newsapi.org/v2/top-headlines?country=TR&apiKey=dcae093f49334707aa3bc698f170ddf5")
-        
     }
     
     public func getTopStories(completion: @escaping (Result<[Article], Error>) -> Void) {
@@ -48,19 +48,20 @@ final class APICaller {
             }
                 
         }
-         task.resume()
+          task.resume()
         
-    }
+   }
     
 }
+
 
 // Models
 
 struct APIResponse: Codable {
     
     let articles: [Article]
-    
 }
+
 
 struct Article: Codable {
     
@@ -70,11 +71,10 @@ struct Article: Codable {
     let url: String?
     let urlToImage: String?
     let publishedAt: String
-    
 }
+
 
 struct Source: Codable {
     
     let name: String
-    
 }

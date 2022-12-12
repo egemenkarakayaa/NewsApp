@@ -5,22 +5,25 @@
 //  Created by Egemen Karakaya on 2.12.2022.
 //
 
-
 import UIKit
+import SafariServices
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    
     private let tableView: UITableView = {
         
-       let table = UITableView()
+        let table = UITableView()
         table.register(NewsTableViewCell.self,
                        forCellReuseIdentifier: NewsTableViewCell.identifier)
-       return table
-        
+        return table
     }()
     
+    
+    private var articles = [Article]()
     private var viewModels = [NewsTableViewCellViewModel]()
 
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,10 +33,23 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.dataSource = self
         view.backgroundColor = .white
         
-        APICaller.shared.getTopStories { [weak self] result in
+        fetchTopStories()
+    }
+    
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.frame = view.bounds
+    }
+    
+    
+    private func fetchTopStories() {
+        
+         APICaller.shared.getTopStories { [weak self] result in
             
             switch result {
             case .success(let articles):
+                self?.articles = articles
                 self?.viewModels = articles.compactMap({
                 NewsTableViewCellViewModel(title: $0.title,
                                            subtitle: $0.description ?? "No Description",
@@ -53,10 +69,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
-    }
     
     // TableView Functions
     
@@ -75,6 +87,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                
         cell.configure(with: viewModels[indexPath.row])
         
+        cell.contentView.backgroundColor = .systemFill
+        
         return cell
     }
     
@@ -82,6 +96,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        let article = articles[indexPath.row]
+        
+        guard let url = URL(string: article.url ?? "") else {
+            return
+        }
+        
+        let vc = SFSafariViewController(url: url)
+        present(vc, animated: true)
         
     }
     
